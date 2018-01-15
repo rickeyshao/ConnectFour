@@ -12,6 +12,11 @@ import com.rickey.game.datamodel.GridPanel;
 public class ConnectWinStrategy implements IWinStrategy {
     //If a player inserts a disc and connects more than three discs of his color, he will be the winner.
     public static final ConnectWinStrategy CONNECTION_FOUR_STRATEGY = new ConnectWinStrategy(4);
+    //According to the game definition, there are four directions to win
+    private static final int[][] WIN_DIRECTIONS = new int[][]{{0, 1},    //vertical
+            {1, 0},    //horizontal
+            {1, 1},    //diagonal
+            {1, -1}};  //back diagonal
 
     private int winCount;
 
@@ -36,60 +41,22 @@ public class ConnectWinStrategy implements IWinStrategy {
      */
     @Override
     public boolean isWin(GridPanel panel, Cell cell) {
-        int count = 1;
-        //1. check vertical
-        Cell tempCell = cell;
-        //while ((tempCell = panel.getUpSameCell(tempCell)) != null){
-        //    count++;
-        //}
-        //tempCell = cell;
-        while ((tempCell = panel.getDownSameCell(tempCell)) != null){
-            count++;
-        }
-        if(count >= winCount){
-            return true;
-        }
-
-        //2. check horizontal
-        count = 1;
-        tempCell = cell;
-        while ((tempCell = panel.getRightSameCell(tempCell)) != null){
-            count++;
-        }
-        tempCell = cell;
-        while ((tempCell = panel.getLeftSameCell(tempCell)) != null){
-            count++;
-        }
-        if(count >= winCount){
-            return true;
-        }
-
-        //3. check diagonal
-        count = 1;
-        tempCell = cell;
-        while ((tempCell = panel.getLeftUpSameCell(tempCell)) != null){
-            count++;
-        }
-        tempCell = cell;
-        while ((tempCell = panel.getRightDownSameCell(tempCell)) != null){
-            count++;
-        }
-        if(count >= winCount){
-            return true;
-        }
-
-        //4. check back diagonal
-        count = 1;
-        tempCell = cell;
-        while ((tempCell = panel.getRightUpSameCell(tempCell)) != null){
-            count++;
-        }
-        tempCell = cell;
-        while ((tempCell = panel.getLeftDownSameCell(tempCell)) != null){
-            count++;
-        }
-        if(count >= winCount){
-            return true;
+        for(int n = 0; n < WIN_DIRECTIONS.length; n++){
+            int[] direction = WIN_DIRECTIONS[n];
+            int count = 1;
+            Cell tempCell = cell;
+            //check positive direction, direction[0] -> x, direction[1] -> y
+            while ((tempCell = panel.getSameCell(tempCell, direction[0], direction[1])) != null){
+                count++;
+            }
+            //check negative direction
+            tempCell = cell;
+            while ((tempCell = panel.getSameCell(tempCell, -direction[0], -direction[1])) != null){
+                count++;
+            }
+            if(count >= winCount){
+                return true;
+            }
         }
 
         return false;

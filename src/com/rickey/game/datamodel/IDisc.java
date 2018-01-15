@@ -7,7 +7,9 @@ package com.rickey.game.datamodel;
  * @author Rickey Shao
  * @since 1.0
  */
-public interface IDisc {
+public interface IDisc extends Cloneable{
     public String getShortDisplay();
     public String getFullDisplay();
+
+    public Object clone();
 }

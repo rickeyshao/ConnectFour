@@ -7,7 +7,7 @@ package com.rickey.game.datamodel;
  * @author Rickey Shao
  * @since 1.0
  */
-public class Cell<T> {
+public class Cell<T extends IDisc> implements Cloneable {
     //column index
     private int positionX;
     //row index
@@ -77,5 +77,17 @@ public class Cell<T> {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Object clone(){
+        Cell cell = null;
+        try {
+            cell = (Cell) super.clone();
+        } catch (CloneNotSupportedException e) {
+            //would not happen
+        }
+        cell.data = (T) data.clone();
+        return cell;
     }
 }

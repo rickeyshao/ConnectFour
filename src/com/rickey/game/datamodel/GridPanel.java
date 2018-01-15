@@ -125,114 +125,27 @@ public abstract class GridPanel<T extends IDisc> {
         }
     }
 
-    public Cell<T> getUpSameCell(Cell<T> cell){
+    /**
+     * Find some cell which position is x = cell.x + xDiff, y = cell.y + yDiff, and whose value is the same as cell
+     *
+     * @param cell
+     *          the cell
+     * @param xDiff
+     *          the difference in x
+     * @param yDiff
+     *          the difference in y
+     * @return if the target is found, return it; return null otherwise
+     */
+    public Cell<T> getSameCell(Cell<T> cell, int xDiff, int yDiff){
         checkCell(cell);
-        //no up cell
-        if(cell.getPositionY() == maxY - 1){
+        int x = cell.getPositionX() + xDiff;
+        int y = cell.getPositionY() + yDiff;
+        if(x >= maxX || x < 0 || y >= maxY || y < 0){
             return null;
         }
-
-        Cell upCell = grid[cell.getPositionX()][cell.getPositionY() + 1];
-        if(cell.getData().equals(upCell.getData())){
-            return upCell;//TODO: return a clone
-        }
-        return null;
-    }
-
-    public Cell<T> getDownSameCell(Cell<T> cell){
-        checkCell(cell);
-        //no down cell
-        if(cell.getPositionY() == 0){
-            return null;
-        }
-
-        Cell downCell = grid[cell.getPositionX()][cell.getPositionY() - 1];
-        if(cell.getData().equals(downCell.getData())){
-            return downCell;//TODO: return a clone
-        }
-        return null;
-    }
-
-    public Cell<T> getLeftSameCell(Cell<T> cell){
-        checkCell(cell);
-        //no left cell
-        if(cell.getPositionX() == 0){
-            return null;
-        }
-
-        Cell leftCell = grid[cell.getPositionX() - 1][cell.getPositionY()];
-        if(cell.getData().equals(leftCell.getData())){
-            return leftCell;//TODO: return a clone
-        }
-        return null;
-    }
-
-    public Cell<T> getRightSameCell(Cell<T> cell){
-        checkCell(cell);
-        //no right cell
-        if(cell.getPositionX() == maxX - 1){
-            return null;
-        }
-
-        Cell rightCell = grid[cell.getPositionX() + 1][cell.getPositionY()];
-        if(cell.getData().equals(rightCell.getData())){
-            return rightCell;//TODO: return a clone
-        }
-        return null;
-    }
-
-    public Cell<T> getRightUpSameCell(Cell<T> cell){
-        checkCell(cell);
-        //no right-up cell
-        if(cell.getPositionX() == maxX - 1 || cell.getPositionY() == maxY - 1){
-            return null;
-        }
-
-        Cell rightUpCell = grid[cell.getPositionX() + 1][cell.getPositionY() + 1];
-        if(cell.getData().equals(rightUpCell.getData())){
-            return rightUpCell;//TODO: return a clone
-        }
-        return null;
-    }
-
-    public Cell<T> getRightDownSameCell(Cell<T> cell){
-        checkCell(cell);
-        //no right-down cell
-        if(cell.getPositionX() == maxX - 1 || cell.getPositionY() == 0){
-            return null;
-        }
-
-        Cell rightDownCell = grid[cell.getPositionX() + 1][cell.getPositionY() - 1];
-        if(cell.getData().equals(rightDownCell.getData())){
-            return rightDownCell;//TODO: return a clone
-        }
-        return null;
-    }
-
-    public Cell<T> getLeftUpSameCell(Cell<T> cell){
-        checkCell(cell);
-        //no left-up cell
-        if(cell.getPositionX() == 0 || cell.getPositionY() == maxY - 1){
-            return null;
-        }
-
-        Cell leftUpCell = grid[cell.getPositionX() - 1][cell.getPositionY() + 1];
-        if(cell.getData().equals(leftUpCell.getData())){
-            return leftUpCell;//TODO: return a clone
-        }
-        return null;
-    }
-
-    public Cell<T> getLeftDownSameCell(Cell<T> cell){
-        checkCell(cell);
-        //no left-down cell
-        if(cell.getPositionX() == 0 || cell.getPositionY() == 0){
-            return null;
-        }
-
-        Cell leftDownCell = grid[cell.getPositionX() - 1][cell.getPositionY() - 1];
-        if(cell.getData().equals(leftDownCell.getData())){
-            return leftDownCell;//TODO: return a clone
+        Cell targetCell = grid[x][y];
+        if(cell.getData().equals(targetCell.getData())){
+            return (Cell<T>)targetCell.clone();  //for safety, return a copy of the cell in grid
         }
         return null;
     }

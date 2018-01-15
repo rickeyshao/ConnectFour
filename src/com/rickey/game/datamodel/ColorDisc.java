@@ -40,4 +40,15 @@ public class ColorDisc implements IDisc {
     public String getFullDisplay() {
         return color;
     }
+
+    @Override
+    public Object clone(){
+        ColorDisc colorDisc = null;
+        try {
+            colorDisc = (ColorDisc) super.clone();
+        } catch (CloneNotSupportedException e) {
+            //would not happen
+        }
+        return colorDisc;
+    }
 }
