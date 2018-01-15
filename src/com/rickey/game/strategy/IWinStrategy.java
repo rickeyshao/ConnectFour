@@ -1,7 +1,7 @@
 package com.rickey.game.strategy;
 
-import com.rickey.game.datamodel.Cell;
 import com.rickey.game.datamodel.GridPanel;
+import com.rickey.game.datamodel.Step;
 
 /**
  * An interface of the strategy on how to identify the winner in the game.
@@ -16,11 +16,11 @@ public interface IWinStrategy {
      *
      * @param panel
      *         The grid panel where the strategy works on
-     * @param cell
-     *         The last cell where some action was performed
+     * @param step
+     *         The last step which was performed by player
      * @return {@code true} if the current player is win, {@code false} otherwise
      */
-    public boolean isWin(GridPanel panel, Cell cell);
+    public boolean isWin(GridPanel panel, Step step);
 
     /**
      * After a cell is filled, check whether the current state is a draw.
@@ -29,7 +29,7 @@ public interface IWinStrategy {
      * @param panel
      *         The grid panel where the strategy works on
      * @return {@code true} if the current player is win, {@code false} otherwise
-     * @see  #isWin(GridPanel panel, Cell cell)
+     * @see  #isWin(GridPanel panel, Step step)
      */
     public boolean isGameADraw(GridPanel panel);
 }

@@ -1,7 +1,9 @@
 package com.rickey.game.strategy;
 
 import com.rickey.game.datamodel.Cell;
+import com.rickey.game.datamodel.CellChange;
 import com.rickey.game.datamodel.GridPanel;
+import com.rickey.game.datamodel.Step;
 
 /**
  * An implement class of interface {@code IWinStrategy}.
@@ -35,17 +37,19 @@ public class ConnectWinStrategy implements IWinStrategy {
      *
      * @param panel
      *         The grid panel where the strategy works on
-     * @param cell
-     *         The last cell where some action was performed
+     * @param step
+     *         The last step which was performed by player
      * @return {@code true} if the current player is win, {@code false} otherwise
      */
     @Override
-    public boolean isWin(GridPanel panel, Cell cell) {
+    public boolean isWin(GridPanel panel, Step step) {
+        //For 'Connect *' games, there is only one cell change in a step
+        Cell cell = ((CellChange)step.getCellChangeList().get(0)).getCell();
         for(int n = 0; n < WIN_DIRECTIONS.length; n++){
             int[] direction = WIN_DIRECTIONS[n];
             int count = 1;
             Cell tempCell = cell;
-            //check positive direction, direction[0] -> x, direction[1] -> y
+            //check positive direction
             while ((tempCell = panel.getSameCell(tempCell, direction[0], direction[1])) != null){
                 count++;
             }
@@ -72,7 +76,7 @@ public class ConnectWinStrategy implements IWinStrategy {
      * @param panel
      *         The grid panel where the strategy works on
      * @return {@code true} if the current player is win, {@code false} otherwise
-     * @see  #isWin(GridPanel panel, Cell cell)
+     * @see  #isWin(GridPanel panel, Step step)
      */
     @Override
     public boolean isGameADraw(GridPanel panel) {

@@ -1,8 +1,11 @@
 package com.rickey.game.datamodel;
 
 import com.rickey.game.common.GameSystemException;
+import com.rickey.game.common.GameUserException;
 
 import java.io.PrintStream;
+import java.util.List;
+import java.util.Stack;
 
 /**
  * {@code GridPanel} represents a kind of panel with grid on it.
@@ -10,12 +13,12 @@ import java.io.PrintStream;
  * @author Rickey Shao
  * @since 1.0
  */
-public abstract class GridPanel<T extends IDisc> {
+public abstract class GridPanel<T extends IDisc> implements IUndoer<T> {
 
     protected Cell<T>[][] grid;
     protected int maxX;
     protected int maxY;
-    protected Cell latestPut = null;
+    protected Stack<Step<T>> stepStack;
 
     /**
      * Constructs a grid panel with dimension mX * mY. An 2 * 3 grid panel looks like:
@@ -54,6 +57,7 @@ public abstract class GridPanel<T extends IDisc> {
                 grid[x][y] = new Cell<T>(x, y, null);
             }
         }
+        stepStack = new Stack<>();
     }
 
     /**
@@ -103,8 +107,8 @@ public abstract class GridPanel<T extends IDisc> {
      *
      * @return The latest cell which was performed on.
      */
-    public Cell<T> getLatestPut(){
-        return latestPut;
+    public Step<T> getLatestStep(){
+        return stepStack.empty() ? null : stepStack.peek();
     }
 
     /**
@@ -125,17 +129,6 @@ public abstract class GridPanel<T extends IDisc> {
         }
     }
 
-    /**
-     * Find some cell which position is x = cell.x + xDiff, y = cell.y + yDiff, and whose value is the same as cell
-     *
-     * @param cell
-     *          the cell
-     * @param xDiff
-     *          the difference in x
-     * @param yDiff
-     *          the difference in y
-     * @return if the target is found, return it; return null otherwise
-     */
     public Cell<T> getSameCell(Cell<T> cell, int xDiff, int yDiff){
         checkCell(cell);
         int x = cell.getPositionX() + xDiff;
@@ -145,8 +138,28 @@ public abstract class GridPanel<T extends IDisc> {
         }
         Cell targetCell = grid[x][y];
         if(cell.getData().equals(targetCell.getData())){
-            return (Cell<T>)targetCell.clone();  //for safety, return a copy of the cell in grid
+            return (Cell<T>)targetCell.clone();
         }
         return null;
     }
+
+    @Override
+    public void stepIn(Step<T> step) {
+        stepStack.push(step);
+    }
+
+    @Override
+    public void stepBack() throws GameUserException {
+        if(stepStack.isEmpty()){
+            throw new GameUserException("Cannot undo now");
+        }
+        Step<T> step = stepStack.pop();
+        List<CellChange<T>> changeList = step.getCellChangeList();
+        for(CellChange<T> cellChange : changeList) {
+            grid[cellChange.getCell().getPositionX()][cellChange.getCell().getPositionY()].setData(cellChange.getPreviousValue());
+        }
+        afterStepBack(changeList);
+    }
+
+    protected abstract void afterStepBack(List<CellChange<T>> changeList);
 }

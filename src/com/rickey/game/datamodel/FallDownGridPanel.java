@@ -1,6 +1,8 @@
 package com.rickey.game.datamodel;
 
 import com.rickey.game.common.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The class {@code FallDownGridPanel} implements a logic that when a disc is
@@ -39,8 +41,6 @@ public class FallDownGridPanel<T extends IDisc> extends GridPanel<T> {
      *         the data to fill in the target cell
      * @throws GameUserException
      *          if game player inputs an invalid column
-     * @throws GameSystemException
-     *          when there is an internal error
      */
     public void put(int column, T data) throws GameUserException {
         column -= 1;
@@ -53,9 +53,15 @@ public class FallDownGridPanel<T extends IDisc> extends GridPanel<T> {
         if(columnStates[column] == maxY - 1){
             throw  new GameUserException(String.format("The column [%d] has been full.", column + 1));
         }
+
         columnStates[column]++;
+        T previousData = grid[column][columnStates[column]].getData();
+        Cell<T> cell = new Cell<T>(column, columnStates[column], data);
         grid[column][columnStates[column]].setData(data);
-        latestPut = grid[column][columnStates[column]];
+        ArrayList<CellChange<T>> cellChangeList = new ArrayList<>();
+        cellChangeList.add(new CellChange<T>(cell, previousData, data));
+        Step<T> step = new Step<>(cellChangeList);
+        stepIn(step);
     }
 
     /**
@@ -71,5 +77,13 @@ public class FallDownGridPanel<T extends IDisc> extends GridPanel<T> {
             }
         }
         return true;
+    }
+
+    @Override
+    protected void afterStepBack(List<CellChange<T>> changeList){
+        //for fall down grid panel, there is only one CellChange in the change list
+        CellChange<T> cellChange = changeList.get(0);
+        int column = cellChange.getCell().getPositionX();
+        columnStates[column]--;
     }
 }

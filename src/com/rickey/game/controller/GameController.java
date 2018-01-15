@@ -1,9 +1,9 @@
 package com.rickey.game.controller;
 
 import com.rickey.game.common.GameSystemException;
-import com.rickey.game.datamodel.Cell;
 import com.rickey.game.datamodel.GamePlayer;
 import com.rickey.game.datamodel.GridPanel;
+import com.rickey.game.datamodel.Step;
 import com.rickey.game.strategy.IWinStrategy;
 
 import java.io.PrintStream;
@@ -68,20 +68,23 @@ public abstract class GameController {
         winStrategy = strategy;
     }
 
-    private void doNextTurn()throws GameSystemException {
+    private void doNextTurn() {
         //Find the next player
-        currentPlayerPerform();
-        currentPlayerIndex = (currentPlayerIndex + 1) % gamePlayers.length;
+        if(currentPlayerPerform()){
+            currentPlayerIndex = (currentPlayerIndex + 1) % gamePlayers.length;
+        }else{
+            currentPlayerIndex = (currentPlayerIndex + gamePlayers.length - 1) % gamePlayers.length;
+        }
+
     }
 
-    protected abstract void currentPlayerPerform() throws GameSystemException;
+    protected abstract boolean currentPlayerPerform();
 
     /**
      * When there is a draw or a winner, the game finishes.
      *
-     * @throws GameSystemException
      */
-    public void start() throws GameSystemException {
+    public void start() {
         while (!displayPanelAndCheckWin()){
             doNextTurn();
         }
@@ -93,13 +96,13 @@ public abstract class GameController {
         out.println();
 
         //check winner firstly
-        Cell latestCell = gridPanel.getLatestPut();
-        if(null == latestCell){
+        Step latestStep = gridPanel.getLatestStep();
+        if(null == latestStep){
             //game has not been started
             return false;
         }
 
-        if(winStrategy.isWin(gridPanel, latestCell)){
+        if(winStrategy.isWin(gridPanel, latestStep)){
             out.println(String.format("%s wins!", getLastPlayer()));
             return true;
         }
